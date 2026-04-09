@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Streets Session</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Live Global Banner -->
+<div id="live-global-banner">
+    <div class="live-banner-inner" id="live-banner-items"></div>
+    <span class="live-banner-cta" onclick="navigateTo('live')">Sledovať →</span>
+</div>
+
+<!-- Navbar -->
+<nav id="navbar">
+    <div class="nav-inner">
+        <a href="#" class="nav-logo" data-page="home">
+            <img src="photo/logopurplestreets.png" class="nav-logo-img" alt="The Streets"
+                 onerror="this.style.display='none'">
+        </a>
+        <div class="nav-links">
+            <a href="#" data-page="home" class="active">Domov</a>
+            <a href="#" data-page="calendar">Kalendár</a>
+            <a href="#" data-page="leaderboard">Rebríček</a>
+            <a href="#" data-page="points">Body</a>
+            <a href="#" data-page="live" class="live-nav" id="nav-live-link">Live</a>
+            <a href="#" data-page="organizer">Organizátor</a>
+        </div>
+        <div class="nav-actions">
+            <button class="btn-ghost" id="btn-profile" data-page="profile">
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="7" r="3.5" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M3 17.5C3 14.5 6 12.5 10 12.5C14 12.5 17 14.5 17 17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span id="nav-username">Prihlásenie</span>
+            </button>
+        </div>
+        <button class="nav-mobile-toggle" id="mobile-toggle">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<main id="app">
+
+<!-- ==================== HOME ==================== -->
+<section id="page-home" class="page active">
+    <div class="hero">
+        <div class="hero-content">
+            <img src="photo/logopurplestreets.png" class="hero-logo" alt="The Streets" onerror="this.style.display='none'">
+            <div class="hero-eyebrow">🏀 Street Basketball · Sezóna 2026</div>
+            <h1 class="hero-title">Ulica je<br><span>tvoje</span> ihrisko.</h1>
+            <p class="hero-subtitle">Registruj sa na session, súťaž s najlepšími ballermi a buduj svoj rebríček.</p>
+            <div class="hero-actions">
+                <button class="btn-primary btn-lg" data-page="calendar">Nájdi session</button>
+                <button class="btn-secondary btn-lg" data-page="leaderboard">Rebríček</button>
+            </div>
+            <div class="hero-cities">
+                <span class="hero-city">📍 Bratislava</span>
+                <span class="hero-city">📍 Praha</span>
+                <span class="hero-city">📍 Košice</span>
+                <span class="hero-city">📍 Berlín</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats-row">
+            <div class="stat-card"><span class="stat-number" id="stat-players">0</span><span class="stat-label">Ballerov</span></div>
+            <div class="stat-card"><span class="stat-number" id="stat-sessions">0</span><span class="stat-label">Sessions</span></div>
+            <div class="stat-card"><span class="stat-number" id="stat-cities">4</span><span class="stat-label">Mestá</span></div>
+            <div class="stat-card"><span class="stat-number" id="stat-matches">0</span><span class="stat-label">Zápasov</span></div>
+        </div>
+
+        <div class="section-block">
+            <div class="section-header">
+                <h2>Najbližšie sessions</h2>
+                <button class="btn-text" data-page="calendar">Všetky →</button>
+            </div>
+            <div class="cards-grid" id="home-upcoming"></div>
+        </div>
+
+        <div class="section-block">
+            <div class="section-header">
+                <h2>Posledné výsledky</h2>
+                <button class="btn-text" data-page="leaderboard">Rebríček →</button>
+            </div>
+            <div class="results-list" id="home-results"></div>
+        </div>
+
+        <div class="section-block">
+            <div class="section-header">
+                <h2>Formáty sessions</h2>
+                <button class="btn-text" data-page="points">Bodový systém →</button>
+            </div>
+            <div class="formats-grid">
+                <div class="format-card">
+                    <div class="format-icon">🏆</div>
+                    <h3>Turnaj Pavúk</h3>
+                    <p class="format-meta">Max 16 · Elimination</p>
+                    <p class="format-desc">Klasický bracket. Prehráš — si vonku. Najvyšší multiplier.</p>
+                    <div class="format-points"><span>1. miesto: <strong>150b</strong></span><span>2. miesto: <strong>105b</strong></span></div>
+                </div>
+                <div class="format-card">
+                    <div class="format-icon">👑</div>
+                    <h3>King of the Court</h3>
+                    <p class="format-meta">Max 30 · Rotácia</p>
+                    <p class="format-desc">King ostáva, challenger strieda. Nonstop akcia.</p>
+                    <div class="format-points"><span>1. miesto: <strong>120b</strong></span><span>2. miesto: <strong>84b</strong></span></div>
+                </div>
+                <div class="format-card">
+                    <div class="format-icon">🤝</div>
+                    <h3>3v3</h3>
+                    <p class="format-meta">Max 12 · Squad</p>
+                    <p class="format-desc">Tímová hra, 4 squady po 3. Štandardný multiplier.</p>
+                    <div class="format-points"><span>1. miesto: <strong>100b</strong></span><span>2. miesto: <strong>70b</strong></span></div>
+                </div>
+                <div class="format-card">
+                    <div class="format-icon">⚡</div>
+                    <h3>1v1</h3>
+                    <p class="format-meta">Max 8 · Duel</p>
+                    <p class="format-desc">Čistý duel, jeden na jedného.</p>
+                    <div class="format-points"><span>1. miesto: <strong>80b</strong></span><span>2. miesto: <strong>56b</strong></span></div>
+                </div>
+                <div class="format-card">
+                    <div class="format-icon">🎯</div>
+                    <h3>Skills Challenge</h3>
+                    <p class="format-meta">Max 20 · Skillz</p>
+                    <p class="format-desc">Dribling, streľba, triky. Ukáž čo vieš.</p>
+                    <div class="format-points"><span>1. miesto: <strong>60b</strong></span><span>2. miesto: <strong>42b</strong></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== CALENDAR ==================== -->
+<section id="page-calendar" class="page">
+    <div class="container">
+        <div class="page-header">
+            <h1>Kalendár sessions</h1>
+            <p>Nájdi session vo svojom meste a zaregistruj sa.</p>
+        </div>
+        <div class="city-tabs">
+            <button class="city-tab active" data-city="all">Všetky</button>
+            <button class="city-tab" data-city="Bratislava">Bratislava</button>
+            <button class="city-tab" data-city="Praha">Praha</button>
+            <button class="city-tab" data-city="Košice">Košice</button>
+            <button class="city-tab" data-city="Berlín">Berlín</button>
+        </div>
+        <div class="filters-row">
+            <select id="filter-type" class="select-minimal">
+                <option value="all">Všetky formáty</option>
+                <option value="bracket">Turnaj Pavúk</option>
+                <option value="king">King of the Court</option>
+                <option value="3v3">3v3</option>
+                <option value="1v1">1v1</option>
+                <option value="skills">Skills Challenge</option>
+            </select>
+            <select id="filter-month" class="select-minimal">
+                <option value="all">Všetky mesiace</option>
+                <option value="1">Január</option><option value="2">Február</option>
+                <option value="3">Marec</option><option value="4">Apríl</option>
+                <option value="5">Máj</option><option value="6">Jún</option>
+                <option value="7">Júl</option><option value="8">August</option>
+            </select>
+            <select id="filter-status" class="select-minimal">
+                <option value="all">Všetky</option>
+                <option value="open">Otvorené</option>
+                <option value="completed">Ukončené</option>
+            </select>
+        </div>
+        <div class="sessions-list" id="calendar-sessions"></div>
+    </div>
+</section>
+
+<!-- ==================== LEADERBOARD ==================== -->
+<section id="page-leaderboard" class="page">
+    <div class="container">
+        <div class="page-header">
+            <h1>Rebríček ballerov</h1>
+            <p>Celkové body zo všetkých sessions a turnajov sezóny 2026.</p>
+        </div>
+        <div class="filters-row">
+            <input type="text" id="search-player" class="input-minimal" placeholder="🔍 Hľadať ballera...">
+            <select id="lb-city" class="select-minimal">
+                <option value="all">Všetky mestá</option>
+                <option value="Bratislava">Bratislava</option>
+                <option value="Praha">Praha</option>
+                <option value="Košice">Košice</option>
+                <option value="Berlín">Berlín</option>
+            </select>
+            <select id="lb-type" class="select-minimal">
+                <option value="all">Všetky formáty</option>
+                <option value="bracket">Turnaj Pavúk</option>
+                <option value="king">King of the Court</option>
+                <option value="3v3">3v3</option>
+                <option value="1v1">1v1</option>
+                <option value="skills">Skills Challenge</option>
+            </select>
+        </div>
+        <div class="podium" id="podium"></div>
+        <div class="bball-divider">🏀 Celkový rebríček</div>
+        <div class="leaderboard-table-wrap">
+            <table class="leaderboard-table">
+                <thead><tr><th>#</th><th>Baller</th><th>Mesto</th><th>Zápasy</th><th>Výhry</th><th>Body</th></tr></thead>
+                <tbody id="leaderboard-body"></tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== POINTS ==================== -->
+<section id="page-points" class="page">
+    <div class="points-hero">
+        <div class="points-hero-content">
+            <div class="hero-eyebrow">🏀 The Streets</div>
+            <h1>Bodový systém</h1>
+            <p>Každý formát má vlastný multiplier. Čím náročnejší turnaj, tým viac bodov.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div style="padding: 48px 0 0;">
+
+            <div class="points-explainer">
+                <h3>📐 Ako sa počítajú body?</h3>
+                <p>Každý formát má <strong>základné body</strong> za umiestnenie a <strong>multiplier</strong> podľa náročnosti. Výsledok sa zaokrúhli na celé číslo.</p>
+                <div class="formula-box">Body = Základné body za umiestnenie × Multiplier formátu</div>
+                <p><strong>Príklad:</strong> Vyhráš Turnaj Pavúk → 1. miesto = 100 × 1.5 = <strong>150 bodov</strong></p>
+                <p>Vyhráš 1v1 → 1. miesto = 100 × 0.8 = <strong>80 bodov</strong></p>
+                <p>Body sa sčítavajú zo všetkých turnajov. Čím viac sessionsov odohráš, tým vyšší rank dosiahnеš.</p>
+                <p><strong>Bonus:</strong> Za každú výhru v zápase (nie len celkové umiestnenie) organizátor môže prideliť štatistiky do profilu.</p>
+            </div>
+
+            <h2 style="font-size:22px;font-weight:700;letter-spacing:-0.02em;margin-bottom:20px;">Bodovanie podľa formátu</h2>
+            <div class="points-grid">
+
+                <div class="points-card">
+                    <div class="points-card-head">
+                        <span class="points-card-title">🏆 Turnaj Pavúk</span>
+                        <span class="points-card-mult">×1.5</span>
+                    </div>
+                    <div class="points-card-body">
+                        <div class="points-row"><span class="place">🥇 1. miesto</span><span class="pts">150b</span></div>
+                        <div class="points-row"><span class="place">🥈 2. miesto</span><span class="pts">105b</span></div>
+                        <div class="points-row"><span class="place">🥉 3.–4. miesto</span><span class="pts">68b</span></div>
+                        <div class="points-row"><span class="place">5.–8. miesto</span><span class="pts">38b</span></div>
+                        <div class="points-row"><span class="place">9.–16. miesto</span><span class="pts">15b</span></div>
+                    </div>
+                </div>
+
+                <div class="points-card">
+                    <div class="points-card-head">
+                        <span class="points-card-title">👑 King of the Court</span>
+                        <span class="points-card-mult">×1.2</span>
+                    </div>
+                    <div class="points-card-body">
+                        <div class="points-row"><span class="place">🥇 1. miesto</span><span class="pts">120b</span></div>
+                        <div class="points-row"><span class="place">🥈 2. miesto</span><span class="pts">84b</span></div>
+                        <div class="points-row"><span class="place">🥉 3. miesto</span><span class="pts">60b</span></div>
+                        <div class="points-row"><span class="place">4.–5. miesto</span><span class="pts">42b</span></div>
+                        <div class="points-row"><span class="place">6.–10. miesto</span><span class="pts">24b</span></div>
+                        <div class="points-row"><span class="place">11.–20. miesto</span><span class="pts">12b</span></div>
+                        <div class="points-row"><span class="place">21.–30. miesto</span><span class="pts">6b</span></div>
+                    </div>
+                </div>
+
+                <div class="points-card">
+                    <div class="points-card-head">
+                        <span class="points-card-title">🤝 3v3</span>
+                        <span class="points-card-mult">×1.0</span>
+                    </div>
+                    <div class="points-card-body">
+                        <div class="points-row"><span class="place">🥇 1. miesto</span><span class="pts">100b</span></div>
+                        <div class="points-row"><span class="place">🥈 2. miesto</span><span class="pts">70b</span></div>
+                        <div class="points-row"><span class="place">🥉 3.–4. miesto</span><span class="pts">45b</span></div>
+                        <div class="points-row"><span class="place">5.–8. miesto</span><span class="pts">25b</span></div>
+                        <div class="points-row"><span class="place">9.–12. miesto</span><span class="pts">10b</span></div>
+                    </div>
+                </div>
+
+                <div class="points-card">
+                    <div class="points-card-head">
+                        <span class="points-card-title">⚡ 1v1</span>
+                        <span class="points-card-mult">×0.8</span>
+                    </div>
+                    <div class="points-card-body">
+                        <div class="points-row"><span class="place">🥇 1. miesto</span><span class="pts">80b</span></div>
+                        <div class="points-row"><span class="place">🥈 2. miesto</span><span class="pts">56b</span></div>
+                        <div class="points-row"><span class="place">🥉 3.–4. miesto</span><span class="pts">36b</span></div>
+                        <div class="points-row"><span class="place">5.–8. miesto</span><span class="pts">20b</span></div>
+                    </div>
+                </div>
+
+                <div class="points-card">
+                    <div class="points-card-head">
+                        <span class="points-card-title">🎯 Skills Challenge</span>
+                        <span class="points-card-mult">×0.6</span>
+                    </div>
+                    <div class="points-card-body">
+                        <div class="points-row"><span class="place">🥇 1. miesto</span><span class="pts">60b</span></div>
+                        <div class="points-row"><span class="place">🥈 2. miesto</span><span class="pts">42b</span></div>
+                        <div class="points-row"><span class="place">🥉 3. miesto</span><span class="pts">30b</span></div>
+                        <div class="points-row"><span class="place">4.–5. miesto</span><span class="pts">21b</span></div>
+                        <div class="points-row"><span class="place">6.–10. miesto</span><span class="pts">12b</span></div>
+                        <div class="points-row"><span class="place">11.–20. miesto</span><span class="pts">3b</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="points-explainer" style="margin-top:8px;">
+                <h3>⚖️ Prečo rôzne multipliery?</h3>
+                <p>Multiplier odráža <strong>náročnosť formátu</strong> a <strong>počet hráčov</strong>. Turnaj Pavúk (×1.5) je najtažší — eliminuješ sa, žiadna druhá šanca. King of the Court (×1.2) odmeňuje konzistentnosť. Skills Challenge (×0.6) je zábavný, ale bodovo menej hodnotný.</p>
+                <p>Tento systém zabezpečuje, že <strong>najlepší allround baller</strong> — nie len špecialista — obsadí vrchol rebríčka.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ==================== LIVE ==================== -->
+<section id="page-live" class="page">
+    <div class="container">
+        <div class="page-header">
+            <h1>🔴 Live Session</h1>
+            <p>Sleduj prebiehajúce zápasy v reálnom čase.</p>
+        </div>
+        <div id="live-no-session" class="empty-state">
+            <div class="empty-icon">📡</div>
+            <h3>Žiadna aktívna session</h3>
+            <p>Momentálne neprebieha žiadna live session.</p>
+            <button class="btn-primary" data-page="calendar">Pozri kalendár</button>
+        </div>
+        <div id="live-content" style="display:none;">
+            <div class="live-session-tabs" id="live-session-tabs"></div>
+            <div id="live-session-view">
+                <div class="live-header-card">
+                    <div class="live-badge">● LIVE</div>
+                    <h2 id="live-session-name"></h2>
+                    <p id="live-session-info"></p>
+                </div>
+                <div id="live-bracket" class="bracket-container" style="display:none;"></div>
+                <div id="live-standings" style="display:none;">
+                    <h3>Aktuálne poradie</h3>
+                    <div class="standings-list" id="live-standings-list"></div>
+                </div>
+                <div class="section-block">
+                    <h3>Zápasy</h3>
+                    <div class="matches-list" id="live-matches"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== PROFILE ==================== -->
+<section id="page-profile" class="page">
+    <div class="container">
+        <!-- Auth -->
+        <div id="profile-login">
+            <div class="auth-card">
+                <h1>Vitaj, baller 🏀</h1>
+                <p>Prihlás sa alebo vytvor nový účet.</p>
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-auth="login">Prihlásenie</button>
+                    <button class="auth-tab" data-auth="register">Registrácia</button>
+                </div>
+
+                <!-- Login — 1x heslo -->
+                <form id="form-login" class="auth-form">
+                    <div class="form-group">
+                        <label>Prezývka</label>
+                        <input type="text" id="login-username" required placeholder="Tvoja prezývka">
+                    </div>
+                    <div class="form-group">
+                        <label>Heslo</label>
+                        <div class="password-wrap">
+                            <input type="password" id="login-password" required placeholder="Heslo">
+                            <button type="button" class="btn-eye" onclick="togglePassword('login-password',this)">👁</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary btn-full">Prihlásiť sa</button>
+                </form>
+
+                <!-- Register — 2x heslo + opravená forma -->
+                <form id="form-register" class="auth-form" style="display:none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Celé meno</label>
+                            <input type="text" id="reg-name" required placeholder="Meno a priezvisko">
+                        </div>
+                        <div class="form-group">
+                            <label>Prezývka</label>
+                            <input type="text" id="reg-username" required placeholder="Unikátna prezývka">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Vek</label>
+                            <input type="number" id="reg-age" required min="10" max="60" placeholder="Vek">
+                        </div>
+                        <div class="form-group">
+                            <label>Výška (cm)</label>
+                            <input type="number" id="reg-height" required min="100" max="230" placeholder="napr. 185">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Váha (kg)</label>
+                            <input type="number" id="reg-weight" min="30" max="200" placeholder="napr. 80">
+                        </div>
+                        <div class="form-group">
+                            <label>Mesto</label>
+                            <select id="reg-city" required>
+                                <option value="">Vyber mesto</option>
+                                <option value="Bratislava">Bratislava</option>
+                                <option value="Praha">Praha</option>
+                                <option value="Košice">Košice</option>
+                                <option value="Berlín">Berlín</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Pozícia</label>
+                            <select id="reg-position">
+                                <option value="">Vyber pozíciu</option>
+                                <option value="guard">Point Guard</option>
+                                <option value="sg">Shooting Guard</option>
+                                <option value="forward">Small Forward</option>
+                                <option value="pf">Power Forward</option>
+                                <option value="center">Center</option>
+                                <option value="all-around">All-around</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Úroveň</label>
+                            <select id="reg-experience" required>
+                                <option value="">Vyber úroveň</option>
+                                <option value="beginner">Rookie</option>
+                                <option value="intermediate">Pokročilý</option>
+                                <option value="advanced">Skúsený</option>
+                                <option value="pro">Pro Player</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>O sebe</label>
+                        <textarea id="reg-bio" rows="2" placeholder="Tvoj štýl, silné stránky..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Heslo</label>
+                            <div class="password-wrap">
+                                <input type="password" id="reg-password" required placeholder="Min. 4 znaky" minlength="4">
+                                <button type="button" class="btn-eye" onclick="togglePassword('reg-password',this)">👁</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Potvrdiť heslo</label>
+                            <div class="password-wrap">
+                                <input type="password" id="reg-password2" required placeholder="Zopakuj heslo">
+                                <button type="button" class="btn-eye" onclick="togglePassword('reg-password2',this)">👁</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="password-hint" id="reg-hint"></div>
+                    <button type="submit" class="btn-primary btn-full">Vytvoriť účet</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Profile View -->
+        <div id="profile-view" style="display:none;">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profile-avatar">🏀</div>
+                <div class="profile-info">
+                    <h1 id="profile-name"></h1>
+                    <p id="profile-username" class="text-secondary"></p>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn-secondary-light" id="btn-edit-profile">Upraviť profil</button>
+                    <button class="btn-ghost" id="btn-logout">Odhlásiť sa</button>
+                </div>
+            </div>
+            <div class="profile-stats">
+                <div class="stat-card"><span class="stat-number" id="profile-points">0</span><span class="stat-label">Body</span></div>
+                <div class="stat-card"><span class="stat-number" id="profile-matches">0</span><span class="stat-label">Zápasy</span></div>
+                <div class="stat-card"><span class="stat-number" id="profile-wins">0</span><span class="stat-label">Výhry</span></div>
+                <div class="stat-card"><span class="stat-number" id="profile-rank">—</span><span class="stat-label">Rank</span></div>
+            </div>
+            <div class="profile-details-grid">
+                <div class="detail-card">
+                    <h3>🏀 Profil ballera</h3>
+                    <div class="detail-rows" id="profile-details"></div>
+                </div>
+                <div class="detail-card">
+                    <h3>📋 Moje registrácie</h3>
+                    <div id="profile-registrations" class="detail-rows"></div>
+                </div>
+            </div>
+            <div class="section-block">
+                <h3>📜 História turnajov</h3>
+                <div id="profile-history" class="results-list"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== ORGANIZER ==================== -->
+<section id="page-organizer" class="page">
+    <div class="container">
+        <div class="page-header">
+            <h1>Organizátor</h1>
+            <p>Spravuj sessions, pridávaj hráčov, generuj pavúky a zadávaj výsledky.</p>
+        </div>
+        <div class="org-tabs">
+            <button class="org-tab active" data-org="create">Nová session</button>
+            <button class="org-tab" data-org="manage">Správa</button>
+            <button class="org-tab" data-org="results">Výsledky</button>
+            <button class="org-tab" data-org="notepad">+ Hráči</button>
+        </div>
+
+        <div id="org-create" class="org-panel active">
+            <div class="form-card">
+                <h2>Vytvoriť novú session</h2>
+                <form id="form-session">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Názov session</label>
+                            <input type="text" id="session-name" required placeholder="napr. BA Street Cup #8">
+                        </div>
+                        <div class="form-group">
+                            <label>Formát</label>
+                            <select id="session-type" required>
+                                <option value="">Vyber formát</option>
+                                <option value="bracket">Turnaj Pavúk (max 16)</option>
+                                <option value="king">King of the Court (max 30)</option>
+                                <option value="3v3">3v3 (max 12)</option>
+                                <option value="1v1">1v1 (max 8)</option>
+                                <option value="skills">Skills Challenge (max 20)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Mesto</label>
+                            <select id="session-city" required>
+                                <option value="">Vyber mesto</option>
+                                <option value="Bratislava">Bratislava</option>
+                                <option value="Praha">Praha</option>
+                                <option value="Košice">Košice</option>
+                                <option value="Berlín">Berlín</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Court / Miesto</label>
+                            <input type="text" id="session-venue" required placeholder="napr. Tyršovo nábrežie">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Dátum</label>
+                            <input type="date" id="session-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Čas tip-off</label>
+                            <input type="time" id="session-time" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Popis</label>
+                        <textarea id="session-desc" rows="2" placeholder="Podrobnosti..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">Vytvoriť session</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="org-manage" class="org-panel">
+            <div id="org-sessions-list"></div>
+        </div>
+
+        <div id="org-results" class="org-panel">
+            <div class="form-card">
+                <h2>Zadať výsledky</h2>
+                <div class="form-group">
+                    <label>Vyber session</label>
+                    <select id="result-session" class="select-minimal">
+                        <option value="">Vyber session...</option>
+                    </select>
+                </div>
+                <div id="result-form-area"></div>
+            </div>
+        </div>
+
+        <div id="org-notepad" class="org-panel">
+            <div class="form-card">
+                <h2>📝 Pridať hráčov — Notepad</h2>
+                <p style="color:var(--text-secondary);margin-bottom:18px;font-size:13px;">Napíš mená — každé na nový riadok. Heslo pre všetkých: <strong>streets</strong>. Ostatné atribúty sa vygenerujú automaticky.</p>
+                <div class="form-group">
+                    <label>Mená hráčov (jedno na riadok)</label>
+                    <textarea class="notepad-area" id="notepad-names" placeholder="Marek Novotný&#10;Petra Kováčová&#10;Tomáš Šimko"></textarea>
+                </div>
+                <div class="form-group" style="margin-top:8px;">
+                    <label>Mesto (voliteľné)</label>
+                    <select id="notepad-city">
+                        <option value="">Náhodné</option>
+                        <option value="Bratislava">Bratislava</option>
+                        <option value="Praha">Praha</option>
+                        <option value="Košice">Košice</option>
+                        <option value="Berlín">Berlín</option>
+                    </select>
+                </div>
+                <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+                    <button class="btn-primary" onclick="bulkCreatePlayers()">Vytvoriť hráčov</button>
+                    <button class="btn-secondary-light" onclick="document.getElementById('notepad-names').value=''">Vymazať</button>
+                </div>
+                <div id="notepad-result" style="margin-top:14px;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-register">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal('modal-register')">&times;</button>
+        <h2>Registrácia na session</h2>
+        <div id="modal-register-content"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-match">
+    <div class="modal modal-lg">
+        <button class="modal-close" onclick="closeModal('modal-match')">&times;</button>
+        <h2>Editovať zápasy</h2>
+        <div id="modal-match-content"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-edit-profile">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal('modal-edit-profile')">&times;</button>
+        <h2>Upraviť profil</h2>
+        <div id="modal-edit-content"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-player">
+    <div class="modal modal-sm">
+        <button class="modal-close" onclick="closeModal('modal-player')">&times;</button>
+        <div id="modal-player-content"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-bracket">
+    <div class="modal modal-lg">
+        <button class="modal-close" onclick="closeModal('modal-bracket')">&times;</button>
+        <h2>🏆 Turnajový pavúk</h2>
+        <div id="modal-bracket-content"></div>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+<script src="js/app.js"></script>
+</body>
+</html>
