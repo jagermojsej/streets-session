@@ -137,6 +137,7 @@ function renderPage(p) {
         case 'live': renderLive(); break;
         case 'profile': renderProfile(); break;
         case 'organizer': renderOrganizer(); break;
+        case 'kobe6': renderKobe6(); break;
         case 'points': break; // static
     }
 }
@@ -890,6 +891,443 @@ function showPlayer(playerId) {
     openModal('modal-player');
 }
 
+// ═══════════════════════════════════════════════
+//  KOBE 6 TOURNAMENT
+// ═══════════════════════════════════════════════
+
+const K6_KEY = 'ss_kobe6';
+
+function k6Load() {
+    try { return JSON.parse(localStorage.getItem(K6_KEY)) || k6Default(); }
+    catch { return k6Default(); }
+}
+
+function k6Default() {
+    return {
+        players: [
+            { ig: 'demccoo',       nick: 'Demko'      },
+            { ig: 'thestreets.eu', nick: 'UlicaStroj' },
+            { ig: 'hrobakmt',      nick: 'mathew'     },
+            { ig: 'miso_jeck',     nick: 'Jackynator' },
+            { ig: 'edo_chovanec',  nick: 'Chovo'      },
+            { ig: 'marek_koval',   nick: 'Marekboss'  },
+        ],
+        matches: null, champion: null, lastSaved: null
+    };
+}
+
+function k6Save(data) {
+    data.lastSaved = new Date().toISOString();
+    localStorage.setItem(K6_KEY, JSON.stringify(data));
+    const el = document.getElementById('k6-saved-at');
+    if (el) el.textContent = 'Uložené: ' + new Date().toLocaleTimeString('sk-SK');
+}
+
+// Seeding pairs for 16-player single-elim bracket
+// Returns array of [seedA, seedB] for each R16 match (0-indexed seeds)
+const K6_SEEDS_R16 = [
+    [0,15],[7,8],[4,11],[3,12],[2,13],[5,10],[6,9],[1,14]
+];
+// Which two R16 matches feed each QF
+const K6_FEED_QF = [[0,1],[2,3],[4,5],[6,7]];
+// Which two QF matches feed each SF
+const K6_FEED_SF = [[0,1],[2,3]];
+
+function k6BuildMatches(players) {
+    const matches = [];
+    // R16 (round 0): 8 matches
+    for (let i = 0; i < 8; i++) {
+        const [a, b] = K6_SEEDS_R16[i];
+        matches.push({ id: i, round: 0, p1: players[a] || null, p2: players[b] || null, s1: null, s2: null, winner: null });
+    }
+    // QF (round 1): 4 matches
+    for (let i = 0; i < 4; i++) {
+        matches.push({ id: 8+i, round: 1, p1: null, p2: null, s1: null, s2: null, winner: null });
+    }
+    // SF (round 2): 2 matches
+    for (let i = 0; i < 2; i++) {
+        matches.push({ id: 12+i, round: 2, p1: null, p2: null, s1: null, s2: null, winner: null });
+    }
+    // Final (round 3): 1 match
+    matches.push({ id: 14, round: 3, p1: null, p2: null, s1: null, s2: null, winner: null });
+    return matches;
+}
+
+function k6Propagate(matches) {
+    // Returns the full player object of the winner of a match
+    function winnerObj(m) {
+        if (!m.winner) return null;
+        return m.winner === k6DisplayName(m.p1) ? m.p1 : m.p2;
+    }
+    // QF: fed by R16 pairs
+    K6_FEED_QF.forEach(([m1, m2], qi) => {
+        matches[8+qi].p1 = winnerObj(matches[m1]);
+        matches[8+qi].p2 = winnerObj(matches[m2]);
+        if (!matches[8+qi].p1 || !matches[8+qi].p2) {
+            matches[8+qi].s1 = null; matches[8+qi].s2 = null; matches[8+qi].winner = null;
+        }
+    });
+    // SF: fed by QF pairs
+    K6_FEED_SF.forEach(([q1, q2], si) => {
+        matches[12+si].p1 = winnerObj(matches[8+q1]);
+        matches[12+si].p2 = winnerObj(matches[8+q2]);
+        if (!matches[12+si].p1 || !matches[12+si].p2) {
+            matches[12+si].s1 = null; matches[12+si].s2 = null; matches[12+si].winner = null;
+        }
+    });
+    // Final
+    matches[14].p1 = winnerObj(matches[12]);
+    matches[14].p2 = winnerObj(matches[13]);
+    if (!matches[14].p1 || !matches[14].p2) {
+        matches[14].s1 = null; matches[14].s2 = null; matches[14].winner = null;
+    }
+    return matches;
+}
+
+// ── Helper: get display name for bracket (nick + ig) ──
+function k6DisplayName(p) {
+    if (!p) return null;
+    if (typeof p === 'string') return p; // legacy
+    return p.nick || '?';
+}
+function k6BracketLabel(p) {
+    if (!p) return null;
+    if (typeof p === 'string') return p;
+    const nick = p.nick || '?';
+    const ig = p.ig ? ` <span class="k6-ig">@${p.ig.replace('@','')}</span>` : '';
+    return nick + ig;
+}
+
+// ── Players tab ──
+function renderK6Players() {
+    const data = k6Load();
+    const players = data.players;
+    const tab = document.querySelector('.k6-tab[data-k6="players"]');
+    if (tab) tab.textContent = `👟 Hráči (${players.length}/16)`;
+
+    const list = document.getElementById('k6-player-list');
+    if (!list) return;
+
+    if (!players.length) {
+        list.innerHTML = '<p style="color:var(--text-secondary);padding:12px 0;">Zatiaľ žiadni hráči. Vyplň formulár vyššie.</p>';
+    } else {
+        list.innerHTML = players.map((p, i) => {
+            const ig   = typeof p === 'string' ? '' : (p.ig || '');
+            const nick = typeof p === 'string' ? p : (p.nick || '');
+            return `
+            <div class="k6-player-item" id="k6pi-${i}">
+                <div class="k6-player-seed">${i+1}</div>
+                <div class="k6-player-name">
+                    <span style="font-weight:700;">${nick}</span>
+                    ${ig ? `<span style="color:#f97316;font-size:12px;margin-left:6px;">@${ig.replace('@','')}</span>` : ''}
+                </div>
+                <div class="k6-player-actions">
+                    ${i > 0 ? `<button class="k6-player-move" onclick="k6MovePlayer(${i},-1)" title="Nasadiť vyššie">▲</button>` : '<span style="width:32px"></span>'}
+                    ${i < players.length-1 ? `<button class="k6-player-move" onclick="k6MovePlayer(${i},1)" title="Nasadiť nižšie">▼</button>` : '<span style="width:32px"></span>'}
+                    <button class="k6-player-del" onclick="k6RemovePlayer(${i})" title="Odstrániť">×</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    const startBtn = document.getElementById('k6-start-btn');
+    if (startBtn) {
+        const canStart = players.length >= 2;
+        startBtn.disabled = !canStart;
+        startBtn.style.opacity = canStart ? '1' : '0.4';
+        startBtn.textContent = data.matches ? '🔄 Pregenerovať pavúk' : '🏆 Generovať pavúk';
+    }
+
+    const full = players.length >= 16;
+    ['k6-input-ig','k6-input-nick'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.disabled = full; }
+    });
+}
+
+function k6AddPlayer() {
+    const ig   = document.getElementById('k6-input-ig')?.value.trim().replace(/^@/,'');
+    const nick = document.getElementById('k6-input-nick')?.value.trim();
+    if (!nick) { showToast('Zadaj aspoň prezývku!', 'error'); return; }
+    const data = k6Load();
+    if (data.players.length >= 16) { showToast('Maximum 16 hráčov!', 'error'); return; }
+    if (data.players.some(p => (p.nick||p).toLowerCase() === nick.toLowerCase())) { showToast('Prezývka už existuje!', 'error'); return; }
+    data.players.push({ ig: ig || '', nick });
+    k6Save(data);
+    ['k6-input-ig','k6-input-nick'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('k6-input-ig')?.focus();
+    renderK6Players();
+    showToast(`${nick} pridaný! 🏀`, 'success');
+}
+
+function k6RemovePlayer(idx) {
+    const data = k6Load();
+    const p = data.players[idx];
+    const label = typeof p === 'string' ? p : (p.nick || p.name);
+    data.players.splice(idx, 1);
+    if (data.matches) { data.matches = null; showToast('Pavúk resetovaný — hráč bol odobratý.', ''); }
+    k6Save(data);
+    renderK6Players();
+    showToast(`${label} odstránený.`, '');
+}
+
+function k6MovePlayer(idx, dir) {
+    const data = k6Load();
+    const p = data.players;
+    const ni = idx + dir;
+    if (ni < 0 || ni >= p.length) return;
+    [p[idx], p[ni]] = [p[ni], p[idx]];
+    k6Save(data);
+    renderK6Players();
+}
+
+function k6StartTournament() {
+    const data = k6Load();
+    if (data.players.length < 2) { showToast('Minimálne 2 hráči!', 'error'); return; }
+    // Pad to nearest power of 2 (max 16)
+    const players = [...data.players];
+    while (players.length < 16) players.push(null);
+    data.matches = k6BuildMatches(players);
+    data.champion = null;
+    k6Save(data);
+    renderK6Players();
+    // Switch to bracket tab
+    document.querySelectorAll('.k6-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.k6-panel').forEach(p => p.classList.remove('active'));
+    document.querySelector('.k6-tab[data-k6="bracket"]').classList.add('active');
+    document.getElementById('k6-bracket').classList.add('active');
+    renderK6Bracket();
+    showToast('Pavúk vygenerovaný! 🏆', 'success');
+}
+
+// ── Bracket tab ──
+function renderK6Bracket() {
+    const data = k6Load();
+    const el = document.getElementById('k6-bracket-content');
+    if (!el) return;
+
+    if (!data.matches) {
+        el.innerHTML = '<div class="form-card" style="text-align:center;padding:48px;"><p style="color:var(--text-secondary);font-size:15px;">Najprv pridaj hráčov a klikni <strong>Generovať pavúk</strong>.</p></div>';
+        return;
+    }
+
+    // Champion banner
+    let champHtml = '';
+    if (data.champion) {
+        champHtml = `<div class="k6-champion-card">
+            <div style="font-size:48px;margin-bottom:8px;">🏆</div>
+            <h2>VÍŤAZ: ${data.champion}</h2>
+            <p>Gratulujeme! Nike Kobe 6 (3D print) vo víťazovej veľkosti.</p>
+        </div>`;
+    }
+
+    // Active editor
+    const activeId = window._k6EditMatch;
+    let editorHtml = '';
+    if (activeId !== undefined && activeId !== null) {
+        const m = data.matches.find(x => x.id === activeId);
+        if (m && m.p1 && m.p2) {
+            editorHtml = `
+            <div class="k6-score-editor" id="k6-editor">
+                <h3>✏️ Zadaj výsledok zápasu</h3>
+                <div class="k6-score-row">
+                    <div class="k6-score-name">${k6DisplayName(m.p1)}</div>
+                    <input class="k6-score-input" id="k6ei-s1" type="number" min="0" max="99" value="${m.s1 ?? ''}" placeholder="0">
+                    <div class="k6-score-vs">VS</div>
+                    <input class="k6-score-input" id="k6ei-s2" type="number" min="0" max="99" value="${m.s2 ?? ''}" placeholder="0">
+                    <div class="k6-score-name" style="text-align:right;">${k6DisplayName(m.p2)}</div>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+                    <button class="btn-primary" onclick="k6SaveScore(${activeId})">Uložiť výsledok</button>
+                    ${m.winner ? `<button class="btn-danger btn-sm" onclick="k6ClearScore(${activeId})">Zmazať výsledok</button>` : ''}
+                    <button class="btn-ghost btn-sm" onclick="window._k6EditMatch=null;renderK6Bracket()">Zrušiť</button>
+                </div>
+            </div>`;
+        }
+    }
+
+    // Build bracket visually: 4 rounds
+    const rounds = [
+        { name: 'Round of 16', ids: [0,1,2,3,4,5,6,7] },
+        { name: 'Quarter Finals', ids: [8,9,10,11] },
+        { name: 'Semi Finals', ids: [12,13] },
+        { name: 'Finále', ids: [14] }
+    ];
+
+    // Heights: each match takes space proportional to round
+    // R16: base height, QF: 2x, SF: 4x, Final: 8x (gap wise)
+    const matchH = 88; // approx px per match
+    const gap = 12;
+
+    let bracketHtml = '<div class="k6-bracket-wrap"><div class="k6-bracket">';
+    rounds.forEach((round, ri) => {
+        bracketHtml += `<div class="k6-round">`;
+        bracketHtml += `<div class="k6-round-header">${round.name}</div>`;
+
+        const spacing = Math.pow(2, ri); // how many R16 matches each match spans
+        round.ids.forEach((mid, mi) => {
+            const m = data.matches.find(x => x.id === mid);
+            const isFinal = ri === 3;
+            const isActive = activeId === mid;
+            const matchClass = `k6-match${m.winner?' done':''}${isFinal?' final-match':''}${isActive?' ring-active':''}`;
+
+            const topPad = ri === 0 ? 0 : (spacing - 1) * (matchH + gap * 2) / 2;
+
+            bracketHtml += `<div class="k6-match-wrap" style="padding-top:${topPad}px;padding-bottom:${topPad}px;">`;
+            bracketHtml += `<div class="${matchClass}" onclick="k6ClickMatch(${mid})" title="Klikni pre zadanie výsledku">`;
+
+            const n1 = k6DisplayName(m.p1), n2 = k6DisplayName(m.p2);
+            const p1cls = m.winner === n1 ? 'winner' : (m.winner && m.winner !== n1 ? 'loser' : '');
+            const p2cls = m.winner === n2 ? 'winner' : (m.winner && m.winner !== n2 ? 'loser' : '');
+
+            bracketHtml += `<div class="k6-match-player ${p1cls}${!m.p1?' k6-match-empty':''}">
+                <span class="pname">${m.p1 ? k6BracketLabel(m.p1) : '—'}</span>
+                <span class="pscore">${m.s1 !== null ? m.s1 : ''}</span>
+            </div>
+            <div class="k6-match-player ${p2cls}${!m.p2?' k6-match-empty':''}">
+                <span class="pname">${m.p2 ? k6BracketLabel(m.p2) : '—'}</span>
+                <span class="pscore">${m.s2 !== null ? m.s2 : ''}</span>
+            </div>`;
+            bracketHtml += `</div>`; // match
+
+            // Connector line between match and next round
+            if (ri < 3) {
+                bracketHtml += `<div class="k6-connector-h"></div>`;
+            }
+            bracketHtml += `</div>`; // match-wrap
+        });
+
+        bracketHtml += `</div>`; // round
+
+        // Vertical connectors between rounds (except after final)
+        if (ri < 3) {
+            const nextCount = rounds[ri+1].ids.length;
+            bracketHtml += `<div class="k6-round" style="width:0;overflow:visible;">`;
+            bracketHtml += `<div style="height:24px;"></div>`; // header placeholder
+            for (let ci = 0; ci < nextCount; ci++) {
+                const topPad = Math.pow(2, ri) === 1 ? 0 : (Math.pow(2, ri) - 1) * (matchH + gap * 2) / 2;
+                const connH = matchH + gap * 2 + topPad * 2;
+                bracketHtml += `<div style="display:flex;flex-direction:column;height:${connH}px;width:32px;margin-bottom:${Math.pow(2,ri+1) > 2 ? (Math.pow(2,ri)-1)*(matchH+gap*2) : 0}px;">
+                    <div style="flex:1;border-right:1.5px solid var(--border-strong);border-bottom:1.5px solid var(--border-strong);border-radius:0 0 6px 0;"></div>
+                    <div style="flex:1;border-right:1.5px solid var(--border-strong);border-top:1.5px solid var(--border-strong);border-radius:0 6px 0 0;"></div>
+                </div>`;
+            }
+            bracketHtml += `</div>`;
+        }
+    });
+
+    bracketHtml += '</div></div>'; // bracket + wrap
+
+    el.innerHTML = champHtml + editorHtml + bracketHtml;
+
+    // Focus score input if editor open
+    if (activeId !== null && activeId !== undefined) {
+        setTimeout(() => document.getElementById('k6ei-s1')?.focus(), 50);
+    }
+}
+
+function k6ClickMatch(id) {
+    const data = k6Load();
+    const m = data.matches.find(x => x.id === id);
+    if (!m || !m.p1 || !m.p2) {
+        showToast('Čakáme na víťazov predchádzajúcich zápasov.', ''); return;
+    }
+    window._k6EditMatch = (window._k6EditMatch === id) ? null : id;
+    renderK6Bracket();
+    if (window._k6EditMatch !== null) {
+        document.getElementById('k6-editor')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+function k6SaveScore(id) {
+    const s1 = parseInt(document.getElementById('k6ei-s1')?.value);
+    const s2 = parseInt(document.getElementById('k6ei-s2')?.value);
+    if (isNaN(s1) || isNaN(s2)) { showToast('Zadaj obe skóre!', 'error'); return; }
+    if (s1 === s2) { showToast('Výsledok musí mať víťaza (nie remíza)!', 'error'); return; }
+
+    const data = k6Load();
+    const m = data.matches.find(x => x.id === id);
+    m.s1 = s1; m.s2 = s2;
+    m.winner = k6DisplayName(s1 > s2 ? m.p1 : m.p2);
+
+    data.matches = k6Propagate(data.matches);
+
+    // Check for champion
+    const final = data.matches.find(x => x.id === 14);
+    if (final.winner) data.champion = final.winner;
+
+    window._k6EditMatch = null;
+    k6Save(data);
+    renderK6Bracket();
+    showToast(`Výsledok uložený! Víťaz: ${m.winner} 🏀`, 'success');
+}
+
+function k6ClearScore(id) {
+    const data = k6Load();
+    const m = data.matches.find(x => x.id === id);
+    m.s1 = null; m.s2 = null; m.winner = null;
+    // Clear all downstream winners
+    data.matches = k6Propagate(data.matches);
+    data.champion = null;
+    window._k6EditMatch = null;
+    k6Save(data);
+    renderK6Bracket();
+    showToast('Výsledok zmazaný.', '');
+}
+
+function k6ResetConfirm() {
+    if (!confirm('Naozaj resetovať celý turnaj? Všetky výsledky budú zmazané.')) return;
+    const data = k6Load();
+    data.matches = null; data.champion = null;
+    k6Save(data);
+    renderK6Players();
+    renderK6Bracket();
+    showToast('Turnaj resetovaný.', '');
+}
+
+// Export / Import
+function k6Export() {
+    const data = k6Load();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `kobe6-zaloha-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Záloha stiahnutá!', 'success');
+}
+
+function k6Import(input) {
+    const file = input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (!Array.isArray(data.players)) throw new Error();
+            localStorage.setItem(K6_KEY, JSON.stringify(data));
+            renderK6Players();
+            renderK6Bracket();
+            showToast('Záloha importovaná! ✓', 'success');
+        } catch { showToast('Neplatný súbor!', 'error'); }
+    };
+    reader.readAsText(file);
+    input.value = '';
+}
+
+function renderKobe6() {
+    window._k6EditMatch = null;
+    renderK6Players();
+    renderK6Bracket();
+    const data = k6Load();
+    const el = document.getElementById('k6-saved-at');
+    if (el && data.lastSaved) {
+        el.textContent = 'Posledné uloženie: ' + new Date(data.lastSaved).toLocaleString('sk-SK');
+    }
+}
+
 // ── Org Email List ──
 function renderOrgEmails() {
     const el = document.getElementById('org-email-list');
@@ -1086,6 +1524,16 @@ document.addEventListener('DOMContentLoaded',()=>{
     window.addEventListener('scroll',()=>{
         document.getElementById('navbar').style.boxShadow=window.scrollY>5?'0 2px 20px rgba(0,0,0,0.4)':'none';
     });
+
+    // Kobe 6 tabs
+    document.querySelectorAll('.k6-tab').forEach(tab => tab.addEventListener('click', () => {
+        document.querySelectorAll('.k6-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.k6-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('k6-' + tab.dataset.k6)?.classList.add('active');
+        if (tab.dataset.k6 === 'bracket') renderK6Bracket();
+        if (tab.dataset.k6 === 'players') renderK6Players();
+    }));
 
     updateNavUsername();
     updateLiveBanner();

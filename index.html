@@ -30,6 +30,7 @@
             <a href="#" data-page="leaderboard">Rebríček</a>
             <a href="#" data-page="points">Body</a>
             <a href="#" data-page="live" class="live-nav" id="nav-live-link">Live</a>
+            <a href="#" data-page="kobe6" class="kobe6-nav">👟 Kobe 6</a>
             <a href="#" data-page="organizer">Organizátor</a>
         </div>
         <div class="nav-actions">
@@ -51,7 +52,7 @@
 
 <!-- ==================== HOME ==================== -->
 <section id="page-home" class="page active">
-    <div class="hero">
+    <div class="hero" style="display:none;">
         <div class="hero-content">
             <img src="photo/logopurplestreets.png" class="hero-logo" alt="The Streets" onerror="this.style.display='none'">
             <div class="hero-eyebrow">🏀 Street Basketball · Sezóna 2026</div>
@@ -66,6 +67,35 @@
                 <span class="hero-city">📍 Praha</span>
                 <span class="hero-city">📍 Košice</span>
                 <span class="hero-city">📍 Berlín</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kobe 6 Home Teaser -->
+    <div class="k6-home-teaser" onclick="navigateTo('kobe6')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')navigateTo('kobe6')">
+        <div class="k6-home-teaser-inner">
+            <div class="k6-home-teaser-left">
+                <div class="k6-home-teaser-tag">👟 THESTREETS Session · 11 April 2026</div>
+                <h2 class="k6-home-teaser-title">Kobe <span>6</span></h2>
+                <p class="k6-home-teaser-sub">Exkluzívny streetball turnaj.<br>Víťaz získa limitovanú cenu ktorú inde nekúpiš.</p>
+                <div class="k6-home-teaser-pills">
+                    <span class="k6-hook-pill">📍 Kuchajda · 11 April 2026 · 12:00</span>
+                    <span class="k6-hook-pill">🏆 16 hráčov</span>
+                </div>
+                <div style="margin-top:24px;">
+                    <button class="k6-hero-cta-btn" onclick="event.stopPropagation();navigateTo('kobe6')">
+                        <span class="k6-hero-cta-label">Odhaliť cenu <span class="k6-hero-cta-arrow">→</span></span>
+                    </button>
+                </div>
+            </div>
+            <div class="k6-home-teaser-reveal">
+                <img src="photo/kobe6.png" class="k6-home-teaser-shoe" alt="">
+                <div class="k6-home-teaser-mask">
+                    <div class="k6-home-teaser-lock">
+                        <span class="k6-home-teaser-lock-icon">🔒</span>
+                        <span class="k6-home-teaser-lock-text">Klikni a odhal</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -516,6 +546,86 @@
                 <h3>📜 História turnajov</h3>
                 <div id="profile-history" class="results-list"></div>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== KOBE 6 ==================== -->
+<section id="page-kobe6" class="page">
+
+    <div class="k6-hero">
+        <div class="k6-hero-split">
+            <div class="k6-hero-inner">
+                <div class="k6-hero-badge">👟 Exkluzívny turnaj · THESTREETS Session · 11 April 2026</div>
+                <h1 class="k6-hero-title">Kobe <span>6</span></h1>
+                <div class="k6-hero-meta">
+                    <span>📍 Kuchajda, Bratislava</span>
+                    <span>📅 11 April 2026</span>
+                    <span>🕛 12:00</span>
+                    <span>🏆 16 hráčov · Single elimination</span>
+                </div>
+
+                <div class="k6-boom-prize">
+                    <div class="k6-boom-prize-label">🏅 Cena pre víťaza</div>
+                    <div class="k6-boom-prize-name">Nike Kobe 6 Protro<br><strong>ASG Hollywood 3D</strong> <span class="k6-boom-year">2026</span></div>
+                    <div class="k6-boom-prize-retail">Retail €185 · Limitovaný drop</div>
+                </div>
+                <div class="k6-shoe-facts">
+                    <div class="k6-fact"><span class="k6-fact-label">Colorway</span><span>Dark Grey / Chlorine Blue / Daring Red</span></div>
+                    <div class="k6-fact"><span class="k6-fact-label">Koncept</span><span>Mismatched pár — červený + modrý Swoosh, inšpirovaný 3D okuliarmi</span></div>
+                    <div class="k6-fact"><span class="k6-fact-label">Dátum</span><span>11 April 2026 — Kuchajda, Bratislava</span></div>
+                    <div class="k6-fact"><span class="k6-fact-label">Protro</span><span>Pôvodná silueta z 2010, modernizovaná — rovnaký look, lepší komfort.</span></div>
+                    <div class="k6-fact"><span class="k6-fact-label">Bonus</span><span>Balenie obsahuje skutočné 3D okuliare 🎬</span></div>
+                </div>
+                <div class="k6-boom-badges">
+                    <span class="k6-boom-badge">🔥 Najžiadanejší drop 2026</span>
+                    <span class="k6-boom-badge">⚡ Official Nike & Jordan Retailer</span>
+                    <span class="k6-boom-badge">🇸🇰 Exkluzívne na Slovensku</span>
+                </div>
+            </div>
+            <div class="k6-hero-img-wrap">
+                <img src="photo/kobe6.png" class="k6-hero-img" alt="Nike Kobe 6 Protro ASG Hollywood 3D" onerror="this.parentElement.style.display='none'">
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="k6-save-bar" id="k6-save-bar">
+            <span id="k6-saved-at">Neuložené zmeny</span>
+            <div style="display:flex;gap:8px;">
+                <button class="btn-sm btn-secondary-light" onclick="k6Export()">⬇ Export zálohy</button>
+                <label class="btn-sm btn-secondary-light" style="cursor:pointer;">⬆ Import zálohy<input type="file" accept=".json" style="display:none" onchange="k6Import(this)"></label>
+            </div>
+        </div>
+
+        <div class="k6-tabs">
+            <button class="k6-tab active" data-k6="players">👟 Hráči (0/16)</button>
+            <button class="k6-tab" data-k6="bracket">🏆 Pavúk</button>
+        </div>
+
+        <!-- HRÁČI -->
+        <div id="k6-players" class="k6-panel active">
+            <div class="form-card">
+                <h2>Zoznam hráčov</h2>
+                <p class="section-desc">Zadaj hráčov (max 16). Poradie = nasadenie do pavúka (1 = najlepší). V pavúku sa zobrazí prezývka + Instagram.</p>
+                <div class="k6-add-form">
+                    <div class="k6-add-fields">
+                        <input type="text" id="k6-input-ig" class="input-minimal" placeholder="@instagram" style="flex:1;">
+                        <input type="text" id="k6-input-nick" class="input-minimal" placeholder="Prezývka v turnaji" style="flex:1;" onkeydown="if(event.key==='Enter')k6AddPlayer()">
+                    </div>
+                    <button class="btn-primary" onclick="k6AddPlayer()">+ Pridať</button>
+                </div>
+                <div id="k6-player-list"></div>
+                <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;" id="k6-start-wrap">
+                    <button class="btn-primary" id="k6-start-btn" onclick="k6StartTournament()">🏆 Generovať pavúk</button>
+                    <button class="btn-danger btn-sm" onclick="k6ResetConfirm()">Resetovať turnaj</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAVÚK -->
+        <div id="k6-bracket" class="k6-panel">
+            <div id="k6-bracket-content"></div>
         </div>
     </div>
 </section>
