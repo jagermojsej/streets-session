@@ -78,7 +78,7 @@ button { cursor: pointer; }
 #live-global-banner {
     display: none;
     position: fixed;
-    top: 64px;
+    top: 80px;
     left: 0; right: 0;
     z-index: 900;
     background: linear-gradient(90deg, #1a0606 0%, #1e0808 50%, #180606 100%);
@@ -151,7 +151,7 @@ button { cursor: pointer; }
     z-index: 1000;
     background: var(--dark);
     border-bottom: 1px solid var(--dark-border);
-    height: 64px;
+    height: 80px;
 }
 
 .nav-inner {
@@ -173,6 +173,7 @@ button { cursor: pointer; }
 }
 
 .nav-logo-img { height: 52px; width: auto; object-fit: contain; }
+.nav-logo-session { height: 95px; opacity: 0.95; }
 
 .nav-links { display: flex; gap: 2px; }
 
@@ -208,9 +209,9 @@ button { cursor: pointer; }
 .nav-mobile-toggle span { display: block; width: 18px; height: 2px; background: var(--dark-text); border-radius: 2px; transition: var(--transition); }
 
 /* ── Pages ── */
-.page { display: none; padding-top: 64px; min-height: 100vh; animation: fadeIn 0.25s ease; }
+.page { display: none; padding-top: 80px; min-height: 100vh; animation: fadeIn 0.25s ease; }
 .page.active { display: block; }
-.page.has-live-banner { padding-top: 100px; }
+.page.has-live-banner { padding-top: 116px; }
 
 @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 
