@@ -661,9 +661,13 @@ function removeReg(sid,pid) {
 }
 
 // ── Auth ──
-function loginUser(username, password) {
-    const p=getPlayers().find(p=>p.username===username&&p.password===password);
-    if (!p) { showToast('Nesprávna prezývka alebo heslo!','error'); return; }
+function loginUser(identifier, password) {
+    const id = identifier.trim().toLowerCase();
+    const p = getPlayers().find(p =>
+        (p.username === identifier || (p.email && p.email.toLowerCase() === id)) &&
+        p.password === password
+    );
+    if (!p) { showToast('Nesprávna prezývka / email alebo heslo!','error'); return; }
     setUser(p); updateNavUsername();
     showToast(`Vitaj, ${p.name}! 🏀`,'success'); renderProfile();
 }
@@ -671,6 +675,9 @@ function loginUser(username, password) {
 function registerUser(data) {
     const players=getPlayers();
     if (players.some(p=>p.username===data.username)) { showToast('Prezývka už existuje!','error'); return; }
+    if (data.email && players.some(p=>p.email&&p.email.toLowerCase()===data.email.toLowerCase())) {
+        showToast('Email už je zaregistrovaný!','error'); return;
+    }
     if (data.password!==data.password2) { showToast('Heslá sa nezhodujú!','error'); return; }
     const np={id:uid(),...data,points:0,matches:0,wins:0};
     delete np.password2;
@@ -883,6 +890,37 @@ function showPlayer(playerId) {
     openModal('modal-player');
 }
 
+// ── Org Email List ──
+function renderOrgEmails() {
+    const el = document.getElementById('org-email-list');
+    if (!el) return;
+    const players = getPlayers().filter(p => p.email);
+    if (!players.length) {
+        el.innerHTML = '<p style="color:var(--text-secondary);padding:20px 0;">Žiadni hráči s emailom. Emaily sa ukladajú pri registrácii.</p>';
+        return;
+    }
+    const emailStr = players.map(p => p.email).join(', ');
+    el.innerHTML = `
+        <div style="margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <span style="font-size:14px;color:var(--text-secondary);">${players.length} hráčov s emailom</span>
+            <button class="btn-primary btn-sm" onclick="navigator.clipboard.writeText('${emailStr.replace(/'/g,"\\'")}');showToast('Emaily skopírované!','success')">Kopírovať všetky</button>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border-strong);border-radius:var(--radius-md);overflow:hidden;">
+            ${players.map(p=>`
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--border);font-size:13px;">
+                <div>
+                    <span style="font-weight:600;">${p.name}</span>
+                    <span style="color:var(--text-tertiary);margin-left:8px;">@${p.username}</span>
+                </div>
+                <a href="mailto:${p.email}" style="color:var(--accent);font-weight:500;">${p.email}</a>
+            </div>`).join('')}
+        </div>
+        <div style="margin-top:14px;">
+            <label style="font-size:12px;color:var(--text-secondary);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:6px;">Všetky emaily (na skopírovanie do Gmailu / Mailchimpe)</label>
+            <textarea readonly style="width:100%;padding:10px;border:1px solid var(--border-strong);border-radius:var(--radius-md);font-size:12px;color:var(--text-secondary);background:var(--bg);resize:vertical;min-height:64px;">${emailStr}</textarea>
+        </div>`;
+}
+
 // ── Bulk Players ──
 function bulkCreatePlayers() {
     const text=document.getElementById('notepad-names').value.trim();
@@ -991,6 +1029,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         registerUser({
             name:document.getElementById('reg-name').value,
             username:document.getElementById('reg-username').value,
+            email:document.getElementById('reg-email').value.trim(),
             age:parseInt(document.getElementById('reg-age').value),
             height:parseInt(document.getElementById('reg-height').value),
             weight:parseInt(document.getElementById('reg-weight').value)||null,
@@ -1005,6 +1044,17 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     setupPwHint('reg-password','reg-password2','reg-hint');
 
+    // Real-time email uniqueness check
+    document.getElementById('reg-email')?.addEventListener('input', function() {
+        const hint = document.getElementById('email-hint');
+        if (!hint) return;
+        const val = this.value.trim().toLowerCase();
+        if (!val) { hint.textContent=''; return; }
+        const taken = getPlayers().some(p => p.email && p.email.toLowerCase() === val);
+        hint.textContent = taken ? '✗ Email je už zaregistrovaný' : '✓ Email je dostupný';
+        hint.className = 'password-hint ' + (taken ? 'error' : 'ok');
+    });
+
     document.getElementById('btn-logout')?.addEventListener('click',logoutUser);
     document.getElementById('btn-edit-profile')?.addEventListener('click',openEditProfile);
 
@@ -1015,6 +1065,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         document.getElementById('org-'+tab.dataset.org)?.classList.add('active');
         if(tab.dataset.org==='manage') renderOrgManage();
         if(tab.dataset.org==='results') renderResultSelect();
+        if(tab.dataset.org==='emails') renderOrgEmails();
     }));
 
     document.getElementById('form-session')?.addEventListener('submit',e=>{
