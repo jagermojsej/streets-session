@@ -588,43 +588,70 @@
         </div>
     </div>
 
-    <div class="container">
-        <div class="k6-save-bar" id="k6-save-bar">
-            <span id="k6-saved-at">Neuložené zmeny</span>
-            <div style="display:flex;gap:8px;">
-                <button class="btn-sm btn-secondary-light" onclick="k6Export()">⬇ Export zálohy</button>
-                <label class="btn-sm btn-secondary-light" style="cursor:pointer;">⬆ Import zálohy<input type="file" accept=".json" style="display:none" onchange="k6Import(this)"></label>
+    <!-- PREMIUM SECTION: Hráči & Pavúk -->
+    <div class="k6-premium-section">
+        <div class="k6-premium-bg">
+            <div class="k6-premium-glow k6-premium-glow-1"></div>
+            <div class="k6-premium-glow k6-premium-glow-2"></div>
+            <div class="k6-premium-ray k6-premium-ray-1"></div>
+            <div class="k6-premium-ray k6-premium-ray-2"></div>
+            <div class="k6-premium-border-top"></div>
+        </div>
+
+        <div class="k6-premium-container">
+            <div class="k6-save-bar" id="k6-save-bar">
+                <span id="k6-saved-at">Neuložené zmeny</span>
+                <div style="display:flex;gap:8px;">
+                    <button class="btn-sm btn-secondary-light" onclick="k6Export()">⬇ Export zálohy</button>
+                    <label class="btn-sm btn-secondary-light" style="cursor:pointer;">⬆ Import zálohy<input type="file" accept=".json" style="display:none" onchange="k6Import(this)"></label>
+                </div>
             </div>
-        </div>
 
-        <div class="k6-tabs">
-            <button class="k6-tab active" data-k6="players">👟 Hráči (0/16)</button>
-            <button class="k6-tab" data-k6="bracket">🏆 Pavúk</button>
-        </div>
+            <div class="k6-premium-tabs">
+                <button class="k6-premium-tab active" data-k6="players">
+                    <span class="k6-premium-tab-icon">👟</span>
+                    <span class="k6-premium-tab-text">Hráči</span>
+                    <span class="k6-premium-tab-count">(0/16)</span>
+                </button>
+                <button class="k6-premium-tab" data-k6="bracket">
+                    <span class="k6-premium-tab-icon">🏆</span>
+                    <span class="k6-premium-tab-text">Pavúk</span>
+                </button>
+            </div>
 
-        <!-- HRÁČI -->
-        <div id="k6-players" class="k6-panel active">
-            <div class="form-card">
-                <h2>Zoznam hráčov</h2>
-                <p class="section-desc">Zadaj hráčov (max 16). Poradie = nasadenie do pavúka (1 = najlepší). V pavúku sa zobrazí prezývka + Instagram.</p>
-                <div class="k6-add-form">
-                    <div class="k6-add-fields">
-                        <input type="text" id="k6-input-ig" class="input-minimal" placeholder="@instagram" style="flex:1;">
-                        <input type="text" id="k6-input-nick" class="input-minimal" placeholder="Prezývka v turnaji" style="flex:1;" onkeydown="if(event.key==='Enter')k6AddPlayer()">
+            <!-- HRÁČI -->
+            <div id="k6-players" class="k6-panel active">
+                <div class="k6-premium-card">
+                    <div class="k6-premium-card-header">
+                        <h2>Zoznam hráčov</h2>
+                        <span class="k6-premium-card-badge">SINGLE ELIMINATION</span>
                     </div>
-                    <button class="btn-primary" onclick="k6AddPlayer()">+ Pridať</button>
-                </div>
-                <div id="k6-player-list"></div>
-                <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;" id="k6-start-wrap">
-                    <button class="btn-primary" id="k6-start-btn" onclick="k6StartTournament()">🏆 Generovať pavúk</button>
-                    <button class="btn-danger btn-sm" onclick="k6ResetConfirm()">Resetovať turnaj</button>
+                    <p class="k6-premium-card-desc">Zadaj hráčov (max 16). Poradie = nasadenie do pavúka (1 = najlepší). V pavúku sa zobrazí prezývka + Instagram.</p>
+                    <div class="k6-premium-add-form">
+                        <div class="k6-premium-add-fields">
+                            <div class="k6-premium-input-wrap">
+                                <span class="k6-premium-input-icon">@</span>
+                                <input type="text" id="k6-input-ig" class="k6-premium-input" placeholder="instagram">
+                            </div>
+                            <div class="k6-premium-input-wrap">
+                                <span class="k6-premium-input-icon">✦</span>
+                                <input type="text" id="k6-input-nick" class="k6-premium-input" placeholder="Prezývka v turnaji" onkeydown="if(event.key==='Enter')k6AddPlayer()">
+                            </div>
+                        </div>
+                        <button class="k6-premium-add-btn" onclick="k6AddPlayer()">+ Pridať</button>
+                    </div>
+                    <div id="k6-player-list"></div>
+                    <div class="k6-premium-actions" id="k6-start-wrap">
+                        <button class="k6-premium-btn-primary" id="k6-start-btn" onclick="k6StartTournament()">🏆 Generovať pavúk</button>
+                        <button class="k6-premium-btn-danger" onclick="k6ResetConfirm()">Resetovať turnaj</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- PAVÚK -->
-        <div id="k6-bracket" class="k6-panel">
-            <div id="k6-bracket-content"></div>
+            <!-- PAVÚK -->
+            <div id="k6-bracket" class="k6-panel">
+                <div id="k6-bracket-content"></div>
+            </div>
         </div>
     </div>
 </section>
